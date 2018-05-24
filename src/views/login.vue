@@ -30,7 +30,7 @@
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
                     </Form>
-                    <p class="login-tip">输入任意用户名和密码即可</p>
+                    <p class="login-tip">请输入正确的账号密码</p>
                 </div>
             </Card>
         </div>
@@ -39,6 +39,7 @@
 
 <script>
 import Cookies from 'js-cookie';
+import Qs from 'qs';
 export default {
     data () {
         return {
@@ -60,17 +61,41 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'iview_admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
+                    this.$ajax.post('/api/login',Qs.stringify({
+                        username: this.form.userName,
+                        password: this.form.password
+                    }))
+                    .then(function (res) {
+                        debugger;
+                        if(res.data.result_status == 0){
+                            // alert(res.data.result_msg);
+                            Vue.$Notice.error({
+                                title: '错误',
+                                desc: '没有此账号'//res.data.result_msg
+                            });     
+                            return;
+                        }else{
+                            this.$router.push({
+                                name: 'home_index'
+                            });
+                        }
+                    })
+                    .catch(function (error) {
+                        debugger;
+                        if(error.response.data.status == '500'){
+                            alert(error.message);
+                            return;
+                        }
+                        console.log(error);
                     });
+                    // Cookies.set('user', this.form.userName);
+                    // Cookies.set('password', this.form.password);
+                    // this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                    // if (this.form.userName === 'iview_admin') {
+                    //     Cookies.set('access', 0);
+                    // } else {
+                    //     Cookies.set('access', 1);
+                    // }
                 }
             });
         }
