@@ -32,7 +32,10 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 Vue.prototype.$ajax=axios;
-
+iView.Notice.config({
+    top: 50,
+    duration: 3
+});
 new Vue({
     el: '#app',
     router: router,

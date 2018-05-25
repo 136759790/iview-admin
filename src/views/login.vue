@@ -38,8 +38,11 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import Cookies from 'js-cookie';
 import Qs from 'qs';
+import { Notice } from 'iview';
+Vue.component('Notice', Notice);
 export default {
     data () {
         return {
@@ -65,14 +68,18 @@ export default {
                         username: this.form.userName,
                         password: this.form.password
                     }))
-                    .then(function (res) {
+                    .then((res) =>{
                         debugger;
-                        if(res.data.result_status == 0){
+                         if(res.data.result_status == 0){
                             // alert(res.data.result_msg);
-                            Vue.$Notice.error({
-                                title: '错误',
-                                desc: '没有此账号'//res.data.result_msg
-                            });     
+                            this.$Notice.config({
+                                top: 50,
+                                duration: 3
+                            });
+                            this.$Notice.error({
+                            title: '错误',
+                            desc: res.data.result_msg//res.data.result_msg
+                        });
                             return;
                         }else{
                             this.$router.push({
@@ -80,13 +87,12 @@ export default {
                             });
                         }
                     })
-                    .catch(function (error) {
-                        debugger;
-                        if(error.response.data.status == '500'){
-                            alert(error.message);
-                            return;
-                        }
+                    .catch((error)=>{
                         console.log(error);
+                        this.$Notice.error({
+                            title: '错误',
+                            desc: error//res.data.result_msg
+                        });
                     });
                     // Cookies.set('user', this.form.userName);
                     // Cookies.set('password', this.form.password);
